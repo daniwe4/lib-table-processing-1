@@ -13,23 +13,26 @@ namespace CaT\Libs\TableProcessing;
 interface Backend
 {
 	/**
-	 * Delete the option in record
+	 * Delete Record from db.
 	 */
-	public function delete(array $record);
+	public function delete(Record $record);
 
 	/**
-	 * Checks option in record if it is valid
-	 * If not fills key errors with values
+	 * Validate the record and if errors occur fill the error property.
+	 * Fill the error property like this:
+	 * 	$record->withError(array("element name" => array("Error Message")))
 	 */
-	public function valid(array $record): array;
+	public function valid(Record $record): Record;
+
 
 	/**
-	 * Update an existing option
+	 * Update a Record in db.
 	 */
-	public function update(array $record): array;
+	public function update(Record $record): Record;
+
 
 	/**
-	 * Creates a new option
+	 * Create a new record in db.
 	 */
-	public function create(array $record): array;
+	public function create(Record $record): Record;
 }
