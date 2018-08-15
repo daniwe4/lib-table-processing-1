@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\TableProcessing;
 
 /**
@@ -12,38 +14,22 @@ interface Backend
 {
 	/**
 	 * Delete the option in record
-	 *
-	 * @param array
-	 *
-	 * @return null
 	 */
-	public function delete($record);
+	public function delete(array $record);
 
 	/**
 	 * Checks option in record if it is valid
 	 * If not fills key errors with values
-	 *
-	 * @param array
-	 *
-	 * @return array
 	 */
-	public function valid($record);
+	public function valid(array $record): array;
 
 	/**
 	 * Update an existing option
-	 *
-	 * @param array
-	 *
-	 * @return array
 	 */
-	public function update($record);
+	public function update(array $record): array;
 
 	/**
 	 * Creates a new option
-	 *
-	 * @param array
-	 *
-	 * @return array
 	 */
-	public function create($record);
+	public function create(array $record): array;
 }
