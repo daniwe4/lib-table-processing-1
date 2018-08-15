@@ -103,7 +103,7 @@ class TableProcessorTest extends PHPUnit_Framework_TestCase
 		;
 
 		$table = new DummyTableProcessor($this->backend);
-		$result = $table->saveRecord($record);
+		$result = $table->wrapSaveRecord($record);
 
 		$this->assertEquals($result, $record);
 	}
