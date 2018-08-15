@@ -1,6 +1,6 @@
 <?php
 
-namespace CaT\Plugins\MaterialList\TableProcessing;
+namespace CaT\Libs\TableProcessing;
 
 /**
  * Backend interface for table processing.
