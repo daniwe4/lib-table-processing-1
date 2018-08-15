@@ -1,6 +1,8 @@
 <?php
 
-namespace CaT\Plugins\MaterialList\TableProcessing;
+declare(strict_types=1);
+
+namespace CaT\Libs\TableProcessing;
 
 /**
  * Decide how to work with table line.
@@ -19,13 +21,8 @@ class TableProcessor
 
 	/**
 	 * Execute process for delete or save/create
-	 *
-	 * @param mixed[] 	$records
-	 * @param string[] 	$actions
-	 *
-	 * @return mixed[]
 	 */
-	public function process(array $records, array $actions)
+	public function process(array $records, array $actions): array
 	{
 		$delete = in_array(self::ACTION_DELETE, $actions);
 		$save = in_array(self::ACTION_SAVE, $actions);
@@ -46,12 +43,8 @@ class TableProcessor
 
 	/**
 	 * Saves or creates a new record
-	 *
-	 * @param mixed[] 	$record
-	 *
-	 * @return mixed[]
 	 */
-	protected function saveRecord(array $record)
+	protected function saveRecord(array $record): array
 	{
 		$record = $this->backend->valid($record);
 
