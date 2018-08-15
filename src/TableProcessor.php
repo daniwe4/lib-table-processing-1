@@ -27,46 +27,36 @@ class TableProcessor
 		$delete = in_array(self::ACTION_DELETE, $actions);
 		$save = in_array(self::ACTION_SAVE, $actions);
 
-		foreach ($records as $key => $record) {
-			if ($delete && $record["delete"] && $record["object"]->getId() != -1) {
+		foreach ($records as $record) {
+			if ($delete && $record->getDelete() && $record->getObject()->getId() != -1) {
 				$this->deleteRecord($record);
-				unset($records[$key]);
+				unset($record);
 			}
 
-			if ($save && !$record["delete"]) {
-				$records[$key] = $this->saveRecord($record);
+			if ($save && !$record->getDelete()) {
+				$record = $this->backend->valid($record);
+
+				if (count($record->getErrors()) > 0) {
+					$records[] = $record;
+				} else {
+					$records[] = $this->createUpdateRecord($record);
+				}
 			}
 		}
 
 		return $records;
 	}
 
-	/**
-	 * Saves or creates a new record
-	 */
-	protected function saveRecord(array $record): array
+	protected function createUpdateRecord(Record $record): Record
 	{
-		$record = $this->backend->valid($record);
-
-		if (count($record["errors"]) > 0) {
-			return $record;
-		}
-
-		if ($record["object"]->getId() == -1) {
+		if ($record->getObject()->getId() == -1) {
 			return $this->backend->create($record);
 		} else {
 			return $this->backend->update($record);
 		}
 	}
 
-	/**
-	 * Deletes a record
-	 *
-	 * @param mixed[] 	$record
-	 *
-	 * @return null
-	 */
-	protected function deleteRecord(array $record)
+	protected function deleteRecord(Record $record)
 	{
 		$this->backend->delete($record);
 	}
