@@ -1,25 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 use CaT\Libs\TableProcessing;
 
+/**
+ * Wrap the protected methods to public.
+ *
+ * @author Daniel Weise <daniel.weise@concepts-and-training.de>
+ */
 class DummyTableProcessor extends TableProcessing\TableProcessor
 {
-	public function wrapSaveRecord(array $record): array
+	public function wrapSaveRecord(TableProcessing\Record $record): TableProcessing\Record
 	{
-		return $this->saveRecord($record);
+		return $this->createUpdateRecord($record);
 	}
 
-	public function wrapDeleteRecord(array $record)
+	public function wrapDeleteRecord(TableProcessing\Record $record)
 	{
 		$this->deleteRecord($record);
 	}
 }
 
+/**
+ * Tests for the class TableProcessor.
+ *
+ * @author Daniel Weise <daniel.weise@concepts-and-training.de>
+ */
 class TableProcessorTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
 		$this->backend = $this->createMock(TableProcessing\Backend::class);
+		$this->process_object = $this->getMockBuilder("\\CaT\\Libs\\TableProcessing\\ProcessObject")->getMock();
 	}
 
 	public function testCreation()
@@ -29,24 +42,14 @@ class TableProcessorTest extends PHPUnit_Framework_TestCase
 
 	public function testSaveRecordCreate()
 	{
-		$record["object"] = $this->getMockBuilder("test")
-			->setMethods(array("getId"))
-			->getMock();
-
-		$record["object"]
+		$this->process_object
 			->expects($this->once())
 			->method("getId")
 			->willReturn(-1)
 		;
 
-		$record['errors'] = array();
-
-		$this->backend
-			->expects($this->once())
-			->method("valid")
-			->with($record)
-			->willReturn($record)
-		;
+		$record = new TableProcessing\Record();
+		$record = $record->withObject($this->process_object);
 
 		$this->backend
 			->expects($this->once())
@@ -61,24 +64,14 @@ class TableProcessorTest extends PHPUnit_Framework_TestCase
 
 	public function testSaveRecordUpdate()
 	{
-		$record["object"] = $this->getMockBuilder("test")
-			->setMethods(array("getId"))
-			->getMock();
-
-		$record["object"]
+		$this->process_object
 			->expects($this->once())
 			->method("getId")
 			->willReturn(11)
 		;
 
-		$record['errors'] = array();
-
-		$this->backend
-			->expects($this->once())
-			->method("valid")
-			->with($record)
-			->willReturn($record)
-		;
+		$record = new TableProcessing\Record();
+		$record = $record->withObject($this->process_object);
 
 		$this->backend
 			->expects($this->once())
@@ -93,7 +86,8 @@ class TableProcessorTest extends PHPUnit_Framework_TestCase
 
 	public function testSaveRecordError()
 	{
-		$record['errors'] = array(true);
+		$record = new TableProcessing\Record();
+		$record = $record->withErrors(array(true));
 
 		$this->backend
 			->expects($this->once())
@@ -103,14 +97,14 @@ class TableProcessorTest extends PHPUnit_Framework_TestCase
 		;
 
 		$table = new DummyTableProcessor($this->backend);
-		$result = $table->wrapSaveRecord($record);
+		$result = $table->process(array($record), array("save"));
 
-		$this->assertEquals($result, $record);
+		$this->assertTrue(is_array($result));
 	}
 
 	public function testDeleteRecord()
 	{
-		$record = array();
+		$record = new TableProcessing\Record();
 
 		$this->backend
 			->expects($this->once())
