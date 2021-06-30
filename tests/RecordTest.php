@@ -1,12 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
-use CaT\Libs\TableProcessing;
+namespace CaT\Libs\TableProcessing;
 
-class Test implements TableProcessing\ProcessObject
+use PHPUnit\Framework\TestCase;
+
+class Test implements ProcessObject
 {
-	public function getId(): int
+	public function getId() : int
 	{
 		return 11;
 	}
@@ -17,11 +19,11 @@ class Test implements TableProcessing\ProcessObject
  *
  * @author Daniel Weise <daniel.weise@concepts-and-training.de>
  */
-class RecordTest extends PHPUnit_Framework_TestCase
+class RecordTest extends TestCase
 {
-	public function testCreate()
+	public function testCreate() : Record
 	{
-		$object = new TableProcessing\Record();
+		$object = new Record();
 		$this->assertEquals($object->getObject(), null);
 		$this->assertEquals($object->getErrors(), array());
 		$this->assertEquals($object->getDelete(), false);
@@ -33,7 +35,7 @@ class RecordTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @depends testCreate
 	 */
-	public function testWithObject(TableProcessing\Record $object)
+	public function testWithObject(Record $object) : void
 	{
 		$test = new Test();
 		$new_object = $object->withObject($test);
@@ -52,7 +54,7 @@ class RecordTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @depends testCreate
 	 */
-	public function testWithErrors(TableProcessing\Record $object)
+	public function testWithErrors(Record $object) : void
 	{
 		$new_object = $object->withErrors(array("test"));
 
@@ -70,7 +72,7 @@ class RecordTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @depends testCreate
 	 */
-	public function testWithDelete(TableProcessing\Record $object)
+	public function testWithDelete(Record $object) : void
 	{
 		$new_object = $object->withDelete(true);
 
@@ -88,7 +90,7 @@ class RecordTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @depends testCreate
 	 */
-	public function testWithMessages(TableProcessing\Record $object)
+	public function testWithMessages(Record $object) : void
 	{
 		$new_object = $object->withMessages(array("Ein Test"));
 

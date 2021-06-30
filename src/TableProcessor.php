@@ -1,18 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
+/* Copyright (c) 2021 - Stefan Hecken <stefan.hecken@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 namespace CaT\Libs\TableProcessing;
 
 /**
  * Decide how to work with table line.
- *
- * @author Stefan Hecken 	<stefan.hecken@concepts-and-training.de>
  */
 class TableProcessor
 {
 	const ACTION_SAVE = "save";
 	const ACTION_DELETE = "delete";
+
+    /**
+     * @var Backend
+     */
+	protected $backend;
 
 	public function __construct(Backend $backend)
 	{
@@ -22,15 +26,15 @@ class TableProcessor
 	/**
 	 * Execute process for delete or save/create
 	 */
-	public function process(array $records, array $actions): array
+	public function process(array $records, array $actions) : array
 	{
 		$delete = in_array(self::ACTION_DELETE, $actions);
 		$save = in_array(self::ACTION_SAVE, $actions);
 
-		foreach ($records as $record) {
+		foreach ($records as $key => $record) {
 			if ($delete && $record->getDelete() && $record->getObject()->getId() != -1) {
-				$this->deleteRecord($record);
-				unset($record);
+                $this->deleteRecord($record);
+                unset($records[$key]);
 			}
 
 			if ($save && !$record->getDelete()) {
@@ -47,7 +51,7 @@ class TableProcessor
 		return $records;
 	}
 
-	protected function createUpdateRecord(Record $record): Record
+	protected function createUpdateRecord(Record $record) : Record
 	{
 		if ($record->getObject()->getId() == -1) {
 			return $this->backend->create($record);
@@ -56,7 +60,7 @@ class TableProcessor
 		}
 	}
 
-	protected function deleteRecord(Record $record)
+	protected function deleteRecord(Record $record) : void
 	{
 		$this->backend->delete($record);
 	}

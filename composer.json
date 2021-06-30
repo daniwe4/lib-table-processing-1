@@ -11,7 +11,7 @@
         }
     ],
     "autoload" : {
-        "psr-4" : { "CaT\\Libs\\TableProcessing\\" : "src" }
+        "psr-4" : { "CaT\\Libs\\TableProcessing\\" : ["src", "tests"] }
     },
     "require": {},
 	"require-dev" : {

@@ -1,15 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 namespace CaT\Libs\TableProcessing;
 
 /**
- * Interface
- *
- * @author Daniel Weise <daniel.weise@concepts-and-training.de>
+ * Data object representing the db record have to implement this interface.
  */
 interface ProcessObject
 {
-	public function getId(): int;
+	public function getId() : int;
 }

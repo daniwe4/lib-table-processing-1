@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 namespace CaT\Libs\TableProcessing;
 
@@ -12,7 +12,7 @@ namespace CaT\Libs\TableProcessing;
 class Record
 {
 	/**
-	 * @var object
+	 * @var ?ProcessObject
 	 */
 	protected $object;
 
@@ -39,48 +39,48 @@ class Record
 		$this->messages = array();
 	}
 
-	public function getObject()
+	public function getObject() : ?ProcessObject
 	{
 		return $this->object;
 	}
 
-	public function withObject(ProcessObject $object): Record
+	public function withObject(ProcessObject $object) : Record
 	{
 		$clone = clone $this;
 		$clone->object = $object;
 		return $clone;
 	}
 
-	public function getErrors(): array
+	public function getErrors() : array
 	{
 		return $this->errors;
 	}
 
-	public function withErrors(array $errors): Record
+	public function withErrors(array $errors) : Record
 	{
 		$clone = clone $this;
 		$clone->errors = $errors;
 		return $clone;
 	}
 
-	public function getDelete(): bool
+	public function getDelete() : bool
 	{
 		return $this->delete;
 	}
 
-	public function withDelete(bool $delete): Record
+	public function withDelete(bool $delete) : Record
 	{
 		$clone = clone $this;
 		$clone->delete = $delete;
 		return $clone;
 	}
 
-	public function getMessages(): array
+	public function getMessages() : array
 	{
 		return $this->messages;
 	}
 
-	public function withMessages(array $messages): Record
+	public function withMessages(array $messages) : Record
 	{
 		$clone = clone $this;
 		$clone->messages = $messages;

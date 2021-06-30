@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 namespace CaT\Libs\TableProcessing;
 
@@ -15,7 +15,7 @@ interface Backend
 	/**
 	 * Delete Record from db.
 	 */
-	public function delete(Record $record);
+	public function delete(Record $record) : void;
 
 	/**
 	 * Validate the record and if errors occur fill the error property.
