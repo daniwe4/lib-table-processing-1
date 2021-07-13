@@ -6,102 +6,90 @@ namespace CaT\Libs\TableProcessing;
 
 use PHPUnit\Framework\TestCase;
 
-class Test implements ProcessObject
-{
-	public function getId() : int
-	{
-		return 11;
-	}
-}
-
 /**
  * Tests for the class Record.
- *
  * @author Daniel Weise <daniel.weise@concepts-and-training.de>
  */
 class RecordTest extends TestCase
 {
-	public function testCreate() : Record
-	{
-		$object = new Record();
-		$this->assertEquals($object->getObject(), null);
-		$this->assertEquals($object->getErrors(), array());
-		$this->assertEquals($object->getDelete(), false);
-		$this->assertEquals($object->getMessages(), array());
+    public function testCreate() : Record
+    {
+        $object = $this->createMock(ProcessObject::class);
+        $record = new Record($object);
+        $this->assertSame($object, $record->getObject());
+        $this->assertEmpty($record->getErrors());
+        $this->assertEmpty($record->getMessages());
+        $this->assertFalse($record->getDelete());
 
-		return $object;
-	}
+        return $record;
+    }
 
-	/**
-	 * @depends testCreate
-	 */
-	public function testWithObject(Record $object) : void
-	{
-		$test = new Test();
-		$new_object = $object->withObject($test);
+    /**
+     * @depends testCreate
+     */
+    public function testWithErrors(Record $record) : void
+    {
+        $error = new Error("component", "this is a fault");
+        $new_record = $record->withError($error);
 
-		$this->assertEquals($object->getObject(), null);
-		$this->assertEquals($object->getErrors(), array());
-		$this->assertEquals($object->getDelete(), false);
-		$this->assertEquals($object->getMessages(), array());
+        $this->assertEmpty($record->getErrors());
+        $this->assertEmpty($record->getMessages());
+        $this->assertFalse($record->getDelete());
 
-		$this->assertEquals($new_object->getObject(), $test);
-		$this->assertEquals($new_object->getErrors(), array());
-		$this->assertEquals($new_object->getDelete(), false);
-		$this->assertEquals($new_object->getMessages(), array());
-	}
+        $this->assertEquals([$error], $new_record->getErrors());
+        $this->assertEmpty($record->getMessages());
+        $this->assertFalse($record->getDelete());
+    }
 
-	/**
-	 * @depends testCreate
-	 */
-	public function testWithErrors(Record $object) : void
-	{
-		$new_object = $object->withErrors(array("test"));
+    /**
+     * @depends testCreate
+     */
+    public function testWithMessages(Record $record) : void
+    {
+        $message = new Message("this is a message");
+        $new_record = $record->withMessage($message);
 
-		$this->assertEquals($object->getObject(), null);
-		$this->assertEquals($object->getErrors(), array());
-		$this->assertEquals($object->getDelete(), false);
-		$this->assertEquals($object->getMessages(), array());
+        $this->assertEmpty($record->getErrors());
+        $this->assertEmpty($record->getMessages());
+        $this->assertFalse($record->getDelete());
 
-		$this->assertEquals($new_object->getObject(), null);
-		$this->assertEquals($new_object->getErrors(), array("test"));
-		$this->assertEquals($new_object->getDelete(), false);
-		$this->assertEquals($new_object->getMessages(), array());
-	}
+        $this->assertEmpty($record->getErrors());
+        $this->assertEquals([$message], $new_record->getMessages());
+        $this->assertFalse($record->getDelete());
+    }
 
-	/**
-	 * @depends testCreate
-	 */
-	public function testWithDelete(Record $object) : void
-	{
-		$new_object = $object->withDelete(true);
+    /**
+     * @depends testCreate
+     */
+    public function testWithDelete(Record $record) : void
+    {
+        $new_record = $record->withDelete(true);
 
-		$this->assertEquals($object->getObject(), null);
-		$this->assertEquals($object->getErrors(), array());
-		$this->assertEquals($object->getDelete(), false);
-		$this->assertEquals($object->getMessages(), array());
+        $this->assertEmpty($record->getErrors());
+        $this->assertEmpty($record->getMessages());
+        $this->assertFalse($record->getDelete());
 
-		$this->assertEquals($new_object->getObject(), null);
-		$this->assertEquals($new_object->getErrors(), array());
-		$this->assertEquals($new_object->getDelete(), true);
-		$this->assertEquals($new_object->getMessages(), array());
-	}
+        $this->assertEmpty($new_record->getErrors());
+        $this->assertEmpty($new_record->getMessages());
+        $this->assertTrue($new_record->getDelete());
+    }
 
-	/**
-	 * @depends testCreate
-	 */
-	public function testWithMessages(Record $object) : void
-	{
-		$new_object = $object->withMessages(array("Ein Test"));
+    /**
+     * @depends testCreate
+     */
+    public function testErrorsByComponent(Record $record)
+    {
+        $error = new Error("component", "this is a fault");
+        $error2 = new Error("component", "this is a fault again");
+        $error3 = new Error("component2", "this is another fault");
+        $error4 = new Error("component2", "this is a freaky fault");
+        $record = $record->withError($error)
+                         ->withError($error2)
+                         ->withError($error3)
+                         ->withError($error4);
 
-		$this->assertEquals($object->getObject(), null);
-		$this->assertEquals($object->getErrors(), array());
-		$this->assertEquals($object->getDelete(), false);
-		$this->assertEquals($object->getMessages(), array());
-
-		$this->assertEquals($new_object->getObject(), null);
-		$this->assertEquals($new_object->getErrors(), array());
-		$this->assertEquals($new_object->getDelete(), false);
-		$this->assertEquals($new_object->getMessages(), array("Ein Test"));
-	}
+        $filtered_errors = $record->getErrorsByComponent("component");
+        $this->assertEquals(2, count($filtered_errors));
+        $this->assertSame([$error, $error2], $filtered_errors);
+    }
 }

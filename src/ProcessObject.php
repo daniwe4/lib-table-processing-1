@@ -9,5 +9,5 @@ namespace CaT\Libs\TableProcessing;
  */
 interface ProcessObject
 {
-	public function getId() : int;
+    public function getId() : int;
 }
