@@ -11,45 +11,28 @@ use PHPUnit\Framework\TestCase;
  */
 class TableProcessorTest extends TestCase
 {
-    /**
-     * @var Backend|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $backend;
+    public function testCreation() : void
+    {
+        $backend = $this->createMock(Backend::class);
+        $table = new TableProcessor($backend);
+        $this->assertInstanceOf(TableProcessor::class, $table);
+    }
 
-    /**
-     * @var ProcessObject|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $process_object;
-
-	public function setUp() : void
-	{
-		$this->backend = $this->createMock(Backend::class);
-		$this->process_object = $this->getMockBuilder("\\CaT\\Libs\\TableProcessing\\ProcessObject")->getMock();
-	}
-
-	public function testCreation() : void
-	{
-	    $table = new TableProcessor($this->backend);
-	    $this->assertInstanceOf(TableProcessor::class, $table);
-	}
-
-	public function testDeleteProcess() : void
+    public function testDeleteProcess() : void
     {
         $action = TableProcessor::ACTION_DELETE;
 
-        $this->process_object
+        $backend = $this->createMock(Backend::class);
+        $process_object = $this->createMock(ProcessObject::class);
+        $process_object
             ->expects($this->once())
             ->method('getId')
-            ->willReturn(1)
-        ;
+            ->willReturn(1);
 
-        $record = new Record();
-        $record = $record
-            ->withObject($this->process_object)
-            ->withDelete(true)
-        ;
+        $record = new Record($process_object);
+        $record = $record->withDelete(true);
 
-        $table = new TableProcessor($this->backend);
+        $table = new TableProcessor($backend);
         $records = $table->process([$record], [$action]);
 
         $this->assertEmpty($records);
@@ -59,86 +42,78 @@ class TableProcessorTest extends TestCase
     {
         $action = TableProcessor::ACTION_SAVE;
 
-        $record = new Record();
-        $record = $record
-            ->withDelete(false)
-            ->withErrors(['error'])
-        ;
+        $backend = $this->createMock(Backend::class);
+        $process_object = $this->createMock(ProcessObject::class);
+        $error = $this->createMock(Error::class);
+        $record = new Record($process_object);
+        $record = $record->withError($error);
 
-        $this->backend
+        $backend
             ->expects($this->once())
             ->method('valid')
-            ->willReturn($record)
-        ;
+            ->willReturn($record);
 
-        $table = new TableProcessor($this->backend);
+        $table = new TableProcessor($backend);
         $records = $table->process([$record], [$action]);
-        $error = $records[0]->getErrors();
-
-        $this->assertEquals('error', $error[0]);
+        $this->assertEquals([$error], $records[0]->getErrors());
     }
 
     public function testCreateProcess() : void
     {
         $action = TableProcessor::ACTION_SAVE;
-
-        $this->process_object
+        $backend = $this->createMock(Backend::class);
+        $process_object = $this->createMock(ProcessObject::class);
+        $process_object
             ->expects($this->once())
             ->method('getId')
-            ->willReturn(-1)
-        ;
+            ->willReturn(-1);
+        $new_object = $this->createMock(ProcessObject::class);
+        $new_object
+            ->expects($this->never())
+            ->method('getId')
+            ->willReturn(12);
 
-        $record = new Record();
-        $record = $record
-            ->withDelete(false)
-            ->withObject($this->process_object)
-        ;
+        $record = new Record($process_object);
+        $created_record = $record->withObject($new_object);
 
-        $this->backend
+        $backend
             ->expects($this->once())
             ->method('valid')
-            ->willReturn($record)
-        ;
-        $this->backend
+            ->willReturn($record);
+        $backend
             ->expects($this->once())
             ->method('create')
-            ->willReturn($record)
-        ;
+            ->willReturn($created_record);
 
-        $table = new TableProcessor($this->backend);
+        $table = new TableProcessor($backend);
         $records = $table->process([$record], [$action]);
 
-        $this->assertEquals($record, $records[0]);
+        $this->assertEquals($created_record, $records[0]);
     }
 
     public function testUpdateProcess() : void
     {
         $action = TableProcessor::ACTION_SAVE;
+        $backend = $this->createMock(Backend::class);
+        $process_object = $this->createMock(ProcessObject::class);
 
-        $this->process_object
+        $process_object
             ->expects($this->once())
             ->method('getId')
-            ->willReturn(1)
-        ;
+            ->willReturn(1);
 
-        $record = new Record();
-        $record = $record
-            ->withDelete(false)
-            ->withObject($this->process_object)
-        ;
+        $record = new Record($process_object);
 
-        $this->backend
+        $backend
             ->expects($this->once())
             ->method('valid')
-            ->willReturn($record)
-        ;
-        $this->backend
+            ->willReturn($record);
+        $backend
             ->expects($this->once())
             ->method('update')
-            ->willReturn($record)
-        ;
+            ->willReturn($record);
 
-        $table = new TableProcessor($this->backend);
+        $table = new TableProcessor($backend);
         $records = $table->process([$record], [$action]);
 
         $this->assertEquals($record, $records[0]);

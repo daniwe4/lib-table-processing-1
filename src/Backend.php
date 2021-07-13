@@ -7,32 +7,29 @@ namespace CaT\Libs\TableProcessing;
 /**
  * Backend interface for table processing.
  * Defines options how to act with table elements
- *
- * @author Stefan Hecken 	<stefan.hecken@concepts-and-training.de>
+ * @author Stefan Hecken    <stefan.hecken@concepts-and-training.de>
  */
 interface Backend
 {
-	/**
-	 * Delete Record from db.
-	 */
-	public function delete(Record $record) : void;
+    /**
+     * Delete Record from db.
+     */
+    public function delete(Record $record) : void;
 
-	/**
-	 * Validate the record and if errors occur fill the error property.
-	 * Fill the error property like this:
-	 * 	$record->withError(array("element name" => array("Error Message")))
-	 */
-	public function valid(Record $record): Record;
+    /**
+     * Validate the record and if errors occur fill the error property.
+     * Fill the error property like this:
+     *    $record->withError(array("element name" => array("Error Message")))
+     */
+    public function valid(Record $record) : Record;
 
+    /**
+     * Update a Record in db.
+     */
+    public function update(Record $record) : Record;
 
-	/**
-	 * Update a Record in db.
-	 */
-	public function update(Record $record): Record;
-
-
-	/**
-	 * Create a new record in db.
-	 */
-	public function create(Record $record): Record;
+    /**
+     * Create a new record in db.
+     */
+    public function create(Record $record) : Record;
 }
